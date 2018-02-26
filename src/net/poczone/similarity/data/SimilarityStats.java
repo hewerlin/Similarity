@@ -6,14 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.poczone.similarity.metrics.EwerlinSimilarityMetric;
+import net.poczone.similarity.metrics.GeometricMeanFractionSimilarityMetric;
 import net.poczone.similarity.metrics.SimilarityMetric;
 
 public class SimilarityStats<User extends Comparable<User>> {
-	private static final SimilarityMetric DEFAULT_METRIC = new EwerlinSimilarityMetric();
+	private static final SimilarityMetric DEFAULT_METRIC = new GeometricMeanFractionSimilarityMetric();
 
+	private int totalTargetCount;
 	private Map<User, Integer> singleCounts = new HashMap<>();
 	private Map<SimilarityPair<User>, Integer> pairCounts = new HashMap<>();
+
+	public void addTarget() {
+		totalTargetCount++;
+	}
 
 	public void add(User user) {
 		addOne(singleCounts, user);
@@ -38,6 +43,10 @@ public class SimilarityStats<User extends Comparable<User>> {
 	public int count(User user1, User user2) {
 		Integer count = pairCounts.get(SimilarityPair.createOrdered(user1, user2));
 		return count != null ? count : 0;
+	}
+
+	public int getTotalTargetCount() {
+		return totalTargetCount;
 	}
 
 	public List<SimilarityRankedPair<User>> getRankedPairs(SimilarityMetric metric) {
@@ -69,7 +78,7 @@ public class SimilarityStats<User extends Comparable<User>> {
 		int firstCount = count(first);
 		int secondCount = count(second);
 		int bothCount = count(first, second);
-		double similarity = metric.calculateSimilarity(firstCount, secondCount, bothCount);
+		double similarity = metric.calculateSimilarity(firstCount, secondCount, bothCount, totalTargetCount);
 
 		return new SimilarityRankedPair<User>(first, second, firstCount, secondCount, bothCount, similarity);
 	}

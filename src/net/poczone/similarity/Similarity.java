@@ -11,6 +11,8 @@ public class Similarity {
 		SimilarityStats<User> stats = new SimilarityStats<>();
 
 		for (Target target : source.getTargets()) {
+			stats.addTarget();
+			
 			List<User> supporters = source.getSupporters(target);
 			for (int i = 0; i < supporters.size(); i++) {
 				User user1 = supporters.get(i);
